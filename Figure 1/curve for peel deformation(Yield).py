@@ -26,10 +26,10 @@ right_lim = 51
 color = ['blue', 'green', 'orange', 'black']
 
 # peel curve used in manuscript v1 - v6
-V13 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_yield/Video_peel_deformation/Onion2_4.22.21_+-coverslide/Yield__04_22_2021__14_46_39_SHORT.csv'
+V1 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_yield/Video_peel_deformation/Onion2_4.22.21_+-coverslide/Yield__04_22_2021__14_46_39_SHORT.csv'
 
 
-whole_df = pd.read_table(V13,
+whole_df = pd.read_table(V1,
                          delimiter=',',
                          header=None,
                          names=range(0, 2),
