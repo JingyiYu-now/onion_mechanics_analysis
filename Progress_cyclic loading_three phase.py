@@ -582,7 +582,7 @@ for folder in group:
         f += 1
         plt.gcf().subplots_adjust(bottom=0.12, right = 0.8)
 
-        plt.savefig(''f'{output}/Seq_cyclic_threePhase.pdf', transparent = True)
+        # plt.savefig(''f'{output}/Seq_cyclic_threePhase.pdf', transparent = True)
 
         plt.show()
 # print(load_lnr_0)
