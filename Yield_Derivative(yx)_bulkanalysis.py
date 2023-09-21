@@ -1,5 +1,5 @@
 # script: calculate derivative of stress-strain curve
-fhkuacybsinucjirhncgur
+
 import pandas as pd
 import os
 import glob
