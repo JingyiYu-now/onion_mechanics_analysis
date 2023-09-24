@@ -33,15 +33,20 @@ strip1 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretr
 strip2 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/room temperature/strip2'
 strip3 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/room temperature/strip3'
 strip4 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/room temperature/strip4'
+### strips area
+# area_list = [3552762.637, 2927490.149, 3650148.381, 2944460.14]
+
+#dif target force test
 # strip_s1 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/room temperature/strips-1_20g'
 # strip_s2 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/room temperature/strips-2_20g'
 # strip_s3 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/room temperature/strips-3_10g'
 # strip_s4 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/room temperature/strips-4_30g'
 # strip_s5 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/room temperature/strips-5_10g'
-### strips area
-# area_list = [3552762.637, 2927490.149, 3650148.381, 2944460.14]
 ### standard strips area
 # area_list = [3389297.281, 2679108.159, 3082287.14, 3597204.676, 2974816.086]
+
+#representative curve (room temp)
+# Strip_26C = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/room temperature/strips-3_10g'
 # area_list = [3082287.14]
 
 ### 4 degree fruit strips
@@ -50,13 +55,18 @@ strip4 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretr
 # strip3 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strip3_10g'
 # strip4 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strip4_10g'
 # area_list = [4373323.381, 4215275.754, 3970144.4, 3568115.645]
-# strip_s1 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strips-1_20g'
-# strip_s2 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strips-2_20g'
+
+#dif target foce test
+strip_s1 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strips-1_20g'
+strip_s2 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strips-2_20g'
 strip_s3 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strips-3_10g'
-# strip_s4 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strips-4_30g'
-# strip_s5 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strips-5_10g'
+strip_s4 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strips-4_30g'
+strip_s5 = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strips-5_10g'
 ### standard strips area
 # area_list = [3251820.35, 2591324.295, 3610690.651, 3374927.8, 3102991.195]
+
+# representative 4 degree strip
+strip_4C = '/Users/jingyiyu/Documents/Cosgrovelab/Fruit strip/fruit strip seqWretract/strain rate dependency/4C/strips-3_10g'
 area_list = [3610690.651]
 
 
@@ -66,7 +76,7 @@ target = [2,4,6,8,10,10,12,14,16,18,20,20]
 Pull = pd.DataFrame(columns= target)
 Retract = pd.DataFrame(columns= target)
 # group = [strip1, strip2, strip3, strip4]
-group = [strip_s3]
+group = [strip_s1]
 
 # group = [strip_s1, strip_s2, strip_s3, strip_s4, strip_s5]
 
@@ -675,7 +685,7 @@ for folder in group:
         #     break
 
             plt.gcf().subplots_adjust(bottom=0.15, right= 0.815)
-            plt.savefig(''f'{output}/Strain_rate_dependency(pectin_4C).pdf', transparent=True)
+            # plt.savefig(''f'{output}/Strain_rate_dependency(pectin_4C).pdf', transparent=True)
             plt.show()
 
 # mean_pull = []
