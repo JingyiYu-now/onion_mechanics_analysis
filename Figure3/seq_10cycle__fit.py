@@ -1,7 +1,4 @@
-# script: Study progression of elasticity and plasticity with compliance method
-# output value of T & E & P compliance and their incremental compliance;
-# plot: line-plot for exact value, stack bar chart for incremental value
-
+# script: Initial modulus and stiffening parameter estimation (linear and exponential fitting)
 # import necessary package
 import pandas as pd
 import numpy as np
@@ -10,7 +7,6 @@ import glob
 from matplotlib import pyplot as plt
 import matplotlib.lines as mlines
 from math import e
-from numpy import trapz
 import statsmodels.api as sm
 import copy
 import matplotlib as mpl
@@ -29,41 +25,14 @@ output = '/Users/jingyiyu/Documents/Cosgrovelab/manuscript/CW_mechanics_Instron/
 
 # User input
 smf = 0.04
-folder = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/10_seq_load/Onion2/10mmpermin_9.22.20'
 folder2 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/10_seq_load/Onion2/5mmpermin_9.22.20'
-folder3 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/10_seq_load/Onion2/5mmpermin_9.17.20'
-folder4 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/10_seq_load/Onion1'
 Onion3 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/10_seq_load/Onion3/5mmpermin'
-Onion4 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/10_seq_load/Onion4'
 Onion5 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/10_seq_load/Onion5'
 Onion6 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/10_seq_load/Onion6'
-# Con = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Onion_PEG/For_code/Con_pH7.0'
-# PEG = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Onion_PEG/For_code/40percentPEG8k_pH7.0'
 example = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/10_seq_load'
 
-# de-waxed onion peel
-Con = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Chloroform_methanol_treated_onion/Con_freshedly_peeled_washed'
-Chlo = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Chloroform_methanol_treated_onion/Chloroform_ONtreated'
-Chlo_met = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Chloroform_methanol_treated_onion/Chloroform_mechanol_1vs1_ONtreated'
-
-# group = [folder, folder2, folder3, folder4]
-# group = [folder2, Onion3, Onion5]
 group = [example, folder2, Onion3, Onion5, Onion6]
-# group = [Con, Chlo, Chlo_met]
-# group = [folder2]
 
-# total = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_seq_instron/4,8,12,16,20_sequence/Total_3onion'
-# folder4 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_seq_instron/4,8,12,16,20_sequence/seq_Onion_10'
-# folder5 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_seq_instron/4,8,12,16,20_sequence/Onion_6.23.20_9'
-# group = [folder1, folder2, folder3, folder4, folder5]
-
-# 8,12,16,20,24 sequence
-seq1 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_seq_instron/8,12,16,20,24_sequence/Onion1'
-seq2 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_seq_instron/8,12,16,20,24_sequence/onion2_10'
-
-name = 'Onion4'
-# file = ''f'{folder}/Sequential_Instron__02_15_2020__14_30_58_SHORT.csv'
-# output = ''f'{folder1}/summary1.csv'
 
 thickness = 7
 width = 3
@@ -72,8 +41,6 @@ fitpc = 5
 
 # for load sequence of 4-8-12-16-20
 loadx = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-# for load sequence of 8-12-16-20-24
-# loadx = [8, 12, 16, 20, 24]
 
 
 # define a function that calls the index of certain value
@@ -123,82 +90,16 @@ def smooth(pull,f):
 def norm(pull):
     # strain calculated based on very original length (before plastic deformation)
     ori_p = ten_p(first_pull)
-    # strain calculated based on length at the beginning of each pull
-    # ori_p = ten_p(pull)
-
     pull['force_N'] = pull.load * 0.0098
-
     # engineering stress & strain
     pull['stress'] = pull.force_N / (thickness * width * 0.001)
     pull['strain'] = (pull.position - ori_p) / (5000 + ori_p)
-    # true stress & strain
-    # pull['strain'] = np.log(1 + (pull.position - ori_p) / (ori_p + 4500) )
-    # pull['stress'] = pull.force_N/(thickness * width * (ori_p + 4500) / (pull.position + 4500) * 0.001)
 
-def purify_p(pull, target):
-    for i in range(len(pull)):
-        if i < (len(pull)-1) :
-            if pull.load[i] > target:
-                return i
-                break
-        else:
-            return len(pull) -1
-
-def purify_revrs(pull):
-    b = np.array(pull.position)
-    maxp_index = np.argmax(b)
-    threshload = pull.load[maxp_index]
-    for i in range(len(pull)):
-        if pull.load[i] > threshload:
-            rmindex.append(i)
-
-# extract the fitting part of the data and calculate the compliance according to the fitting part
-# (option: fit using load/stress)
-def fit(pull, percentage, target_load):
-    if target_load == 'N':
-        fitting_part = pull[int(len(pull) * (100 - percentage) / 100):].reset_index(drop=True)
-        # fit using gram as unit
-        # z = np.polyfit(fitting_part.position, fitting_part.load, 1)
-
-        # fit using stress (MPa)
-        z = np.polyfit(fitting_part.strain, fitting_part.stress, 1)
-        pull['fit_e'] = pull.strain * z[0] + z[1]
-    else:
-        cutted_data = pull[:ten_ind(pull, target_load)].reset_index(drop=True)
-        fitting_part = cutted_data[int(len(cutted_data) * (100 - percentage) / 100):].reset_index(drop=True)
-        # fit using gram as unit
-        # z = np.polyfit(fitting_part.position, fitting_part.load, 1)
-
-        # fit using stress (MPa)
-        z = np.polyfit(fitting_part.strain, fitting_part.stress, 1)
-        pull['fit_e'] = pull.strain * z[0] + z[1]
-    # Xm = np.median(fitting_part.position)
-    # compliance = 100 / (4500 + Xm) / z[0]
-    modulus = z[0]
-    return modulus
-
-def fit_p(pull, p_pull, percentage):
-    cutted_data = pull[pull.strain < np.max(p_pull.strain)].reset_index(drop=True)
-    fitting_part = cutted_data[int(len(cutted_data) * (100 - percentage) / 100):].reset_index(drop=True)
-    # fit using gram as unit
-    # z = np.polyfit(fitting_part.position, fitting_part.load, 1)
-
-    # fit using stress (MPa)
-    z = np.polyfit(fitting_part.strain, fitting_part.stress, 1)
-    pull['fit_e'] = pull.strain * z[0] + z[1]
-
-    # Xm = np.median(fitting_part.position)
-    # modulus = 100 / (4500 + Xm) / z[0]
-    modulus = z[0]
-    return modulus
 
 def fit_expo(pull, weight):
     ## fit accroding to original data
     z = np.polyfit(pull.strain, np.log(pull.stress), 1, w = weight)
     pull['fit_e'] = e**z[1] * e**(z[0]*pull.strain)
-    ## fit accroding to subtraction of extended linear value
-    # z = np.polyfit(pull.strain, np.log(pull.stress - (pull.strain * load_lnr_0.loc[f,loadx[markj-1]] + load_lnr_1.loc[f,loadx[markj-1]])), 1, w = weight)
-    # pull['fit_e'] = e**z[1] * e**(z[0]*pull.strain) + pull.strain * load_lnr_0.loc[f,loadx[markj-1]] + load_lnr_1.loc[f,loadx[markj-1]]
 
     equation = [z[0], z[1]]
     return equation
@@ -207,9 +108,6 @@ def fit_expo_l(pull, weight):
     ## fit accroding to original data
     z = np.polyfit(pull.strain, np.log(pull.stress), 1, w = weight)
     pull['fit_e'] = e**z[1] * e**(z[0]*pull.strain)
-    ## fit accroding to subtraction of extended linear value
-    # z = np.polyfit(pull.strain, np.log(pull.stress - (pull.strain * load_lnr_0.loc[f,loadx[markj-1]] + load_lnr_1.loc[f,loadx[markj-1]])), 1, w = weight)
-    # pull['fit_e'] = e**z[1] * e**(z[0]*pull.strain) + pull.strain * load_lnr_0.loc[f,loadx[markj-1]] + load_lnr_1.loc[f,loadx[markj-1]]
 
     equation = [z[0], z[1]]
     return equation
@@ -252,25 +150,6 @@ mark = '8'
 total = pd.DataFrame(columns=loadx)
 ela = pd.DataFrame(columns=loadx)
 retra = pd.DataFrame(columns=loadx)
-# for folder in group:
-#
-#     # create data frame for results from each property
-#     t_modulus = pd.DataFrame(columns=loadx)
-#     e_modulus = pd.DataFrame(columns=loadx)
-#     r_modulus = pd.DataFrame(columns=loadx)
-#     # t_inc_comp = pd.DataFrame(columns=loadx)
-#     # e_inc_comp = pd.DataFrame(columns=loadx)
-#     # r_inc_comp = pd.DataFrame(columns=loadx)
-#
-#     if g == 0:
-#         mark = '8'
-#     elif g == 1:
-#         mark = 's'
-#     elif g == 2:
-#         mark = 'p'
-#     elif g == 3:
-#         mark = 'P'
-#
 n = 0
 color = ['C0','C1','C2', 'C3', 'C4', 'C5','C6','C8','C9','C10','C11', 'C12']
 retract_exp_0 = pd.DataFrame(columns=loadx)
@@ -455,8 +334,6 @@ for folder in group:
 
             retract[i].reset_index(inplace=True)
             rmindex = []
-            # purify_revrs(retract[i])
-            # retract[i].drop(retract[i].loc[rmindex].index, inplace=True)
             retract_fit[i] = retract[i].loc[int(len(retract[i])*0.2):int(len(retract[i])*0.95)]
 
             retract_fit[i] = retract_fit[i].reset_index(drop=True)
@@ -557,7 +434,6 @@ for folder in group:
             dx2.scatter(elaexpo[j].strain * 100, (elaexpo[j].stress - elaexpo[j].fit_e)/elaexpo[j].stress *100, color = color[j], s = 2)
             dx2.set(title = 'Residue of exponential fitting', xlabel = 'Strain(%)', ylabel = 'Residue (%)')
 
-        # plt.show()
         fig.set_size_inches(8, 6)
 
         master = plt.subplot(111)
@@ -572,8 +448,6 @@ for folder in group:
         for i in range(2,len(elaexpo)):
             master.plot(elaexpo[i].strain *100, elaexpo[i].fit_e, color = 'grey', linewidth = lw)
         master.set(xlabel = 'Strain(%)', ylabel = 'Stress(MPa)', title = 'Fitting of elastic curves')
-        # master.grid(alpha=0.4, linestyle='--')
-        # experiment =
         load_expo_line = mlines.Line2D([], [], color = 'grey', label = 'Exponential fitting curve')
         load_lnr_line = mlines.Line2D([], [], color = 'black', label = 'Linear fitting curve')
         master.legend(handles = [load_lnr_line, load_expo_line], loc = 2, fontsize=10, frameon = False)
@@ -582,14 +456,10 @@ for folder in group:
         f += 1
         # plt.gcf().subplots_adjust(bottom=0.12, right = 0.8)
 
-        # plt.savefig(''f'{output}/Seq_cyclic_fitting_master.pdf', transparent = True)
-
-        # plt.show()
-# print(load_lnr_0)
+        plt.show()
 
 sa = plt.subplot(211)
 sa2 = plt.subplot(212)
-# sb = plt.subplot(212)
 R_0 = []
 R_1 = []
 L_l0 = []
@@ -604,30 +474,21 @@ L_e0ero = []
 L_e1ero = []
 for i in range(len(loadx)):
     R_0.append(np.mean(retract_exp_0.iloc[:, i]))
-    # R_1.append(np.mean(retract_exp_1.iloc[:, i]))
     L_l0.append(np.mean(load_lnr_0.iloc[:, i]))
-    # L_l1.append(np.mean(load_lnr_1.iloc[:, i]))
 
     R_0ero.append(np.std(retract_exp_0.iloc[:, i]))
-    # R_1ero.append(np.std(retract_exp_1.iloc[:, i]))
     L_l0ero.append(np.std(load_lnr_0.iloc[:, i]))
-    # L_l1ero.append(np.std(load_lnr_1.iloc[:, i]))
     if i > 0:
         L_e0.append(np.mean(load_exp_0.iloc[:, i]))
-        # L_e1.append(np.std(load_exp_1.iloc[:, i]))
         L_e0ero.append(np.std(load_exp_0.iloc[:, i]))
-        # L_e1ero.append(np.std(load_exp_1.iloc[:, i]))
-# print(len(load_exp_1))
+
 loadx_lexpo = [4, 6, 8, 10, 12, 14, 16, 18, 20]
 xlabel = [0,1,2,3,4,5,6,7,8,9,10]
 
 say2 = sa.twinx()
 say2.set_ylabel('Load exponent', rotation=270, va='bottom')
-# say2.set_yticks(range(0, 80, 20))
-# sa.set_yticks(range(0, 80, 20))
 say2.set(ylim = [0, 70])
 sa.set(ylim = [0, 50])
-# sa2.set_yticks(range(0, 150, 25))
 sa2.set(ylim = [0, 150])
 
 # plot as stress
@@ -638,21 +499,12 @@ ms = 4
 lw = 2
 mark = '8'
 sa2.errorbar(x, R_0, yerr = R_0ero, color= 'gray', marker = mark, markersize = ms, linewidth = lw, capsize=5, markeredgewidth= lw)
-# sb.errorbar(loadx, R_1, yerr = R_1ero, color='C7', alpha = 0.6)
 sa.errorbar(x, L_l0, yerr = L_l0ero, color='black', marker = mark, markersize = ms, linewidth = lw, capsize=5, markeredgewidth= lw)
-# sb.errorbar(loadx, L_l1, yerr = L_l1ero, color='C9', alpha = 0.6)
 say2.errorbar(x_expo, L_e0, yerr = L_e0ero, color='gray', marker = mark, markersize = ms, linewidth = lw, capsize=5, markeredgewidth= lw)
-# sb.errorbar(loadx_lexpo, L_e1, yerr = L_e1ero, color='C3', alpha = 0.6)
-# sa.grid(alpha=0.4, linestyle='--')
-# sb.grid(alpha=0.4, linestyle='--')
 
-# ax.set(xlabel='loading (g)', ylabel='Modulus(MPa)', title='Sequential modulus')
 t_line = mlines.Line2D([], [], color = 'C7', label = 'Retract expo base')
-# green_line = mlines.Line2D([], [], color = 'C7', label = 'Retract expo intercept', linestyle = '--')
 orange_line = mlines.Line2D([], [], color = 'C9', label = 'Load linear slope')
-# fr_line = mlines.Line2D([], [], color = 'C9', label = 'Load linear intercept', linestyle = '--')
 blue_line = mlines.Line2D([], [], color = 'C3', label = 'Load expo base')
-# C_line = mlines.Line2D([], [], color = 'C3', label = 'Load expo intercept', linestyle = '--')
 
 sa.legend(handles = [orange_line, blue_line], loc = 1, fontsize=10, frameon = False)
 sa.set(xlabel = 'Stress (MPa)')
@@ -663,14 +515,8 @@ sa2.legend(handles = [t_line], loc = 1, fontsize=10, frameon = False)
 sa2.set(xlabel = 'Stress (MPa)')
 sa2.set_xticks(xlabel)
 sa2.set_xticklabels(xlabel)
-# sa.set_yscale('log')
-# sb.legend(handles = [green_line, fr_line, C_line], loc = 1, fontsize = 8)
-# sb.set(title = 'Secondary parameters', ylim = [-7,5], xlabel = 'Loading (g)')
-# sb.set_xticks(loadx)
-# sb.set_xticklabels(loadx)
-# ax.grid(alpha=0.4, linestyle='--')
 plt.gcf().subplots_adjust(bottom=0.12, right = 0.84, top = 0.95, hspace = 0.35)
-plt.savefig(''f'{output}/Seq_cyclic_fitting_parameter.pdf', transparent = True)
+# plt.savefig(''f'{output}/Seq_cyclic_fitting_parameter.pdf', transparent = True)
 
 plt.show()
 

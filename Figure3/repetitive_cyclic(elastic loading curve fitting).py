@@ -29,26 +29,8 @@ intv = 5
 l = -0.5
 r = 45
 
-Title = 'Cyclic loading to 10g'
-# folder = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Trial_7.28.20/3mmmin'
-folder2 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/repetitive pulling_8.1.20/20g'
-folder3 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Onion2_10+_8.18.20/Video'
-file = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Trial_7.28.20/3mm_min/Sequential_Instron_With_Retracts__07_28_2020__15_48_33_SHORT.csv'
-repetitive20 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Strain_rate_dependency/10mm'
 repetitive10 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/repetitive pulling_8.1.20/10g'
 repetitive10_2 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/repetitive_pulling_10g_3mpm_10.6.20'
-rate1 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/contineous_rate_change'
-
-# PEG treated sample
-# Con = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/Sequential_Instron_With_Retracts_Tstrain_Data/40percent_PEG8k/Control'
-# PEG = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/Sequential_Instron_With_Retracts_Tstrain_Data/40percent_PEG8k/PEG'
-
-# PEG Ca2+ sample
-Con = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/Sequential_Instron_With_Retracts_Tstrain_Data/40percent_PEG8k/Ca2_40perctPEG8k/buffer_con'
-Con_Ca = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/Sequential_Instron_With_Retracts_Tstrain_Data/40percent_PEG8k/Ca2_40perctPEG8k/Ca2+_con'
-PEG_con = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/Sequential_Instron_With_Retracts_Tstrain_Data/40percent_PEG8k/Ca2_40perctPEG8k/buffer+PEG'
-PEG_Ca = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/Sequential_Instron_With_Retracts_Tstrain_Data/40percent_PEG8k/Ca2_40perctPEG8k/Ca2+_PEG'
-# summary = pd.DataFrame()
 
 # define a function that calls the index of certain value
 def ind(df, value):
@@ -75,23 +57,11 @@ def purify_p(pull, target):
 
 # define a function that calculate the stress and strain of the curve
 def norm(pull):
-    # strain calculated based on very original length (before plastic deformation)
-    # ori_p = ten_p(first_pull)
-    # strain calculated based on length at the beginning of each pull
-    # ori_p = ten_p(pull)
-
     pull['force_N'] = pull.load * 0.0098
 
     # engineering stress & strain
     pull['stress'] = pull.force_N / (thickness * width * 0.001)
     pull['strain'] = (pull.position - ori_p) / (5000 + ori_p)
-    # true stress & strainl
-    # pull['strain'] = np.log(1 + (pull.position - ori_p) / (ori_p + 4500) )
-    # pull['stress'] = pull.force_N/(thickness * width * (ori_p + 4500) / (pull.position + 4500) * 0.001)
-
-    # when input is strain (new Instron output setting)
-    # pull['strain'] = np.log(1 + pull.position)
-    # pull['stress'] = pull.force_N/(thickness * width / (pull.position + 1) * 0.001)
 
 def purify_revrs(pull):
     b = np.array(pull.position)
@@ -115,7 +85,6 @@ def derv(pull, inter):
     for i in range(inter, len(pull) - inter):
         deriv.append(
             (pull.stress[i + inter] - pull.stress[i - inter]) / (pull.strain[i + inter] - pull.strain[i - inter]))
-            # interval.append(pull.strain[i + inter] - pull.strain[i - inter])
     for i in range(len(pull) - inter, len(pull)):
         deriv.append((pull.stress[i] - pull.stress[i - inter]) / (pull.strain[i] - pull.strain[i - inter]))
     return deriv
@@ -127,7 +96,6 @@ def dervuni(y, x, inter):
     for i in range(inter, len(y) - inter):
         deriv.append(
             (y[i + inter] - y[i - inter]) / (x[i + inter] - x[i - inter]))
-            # interval.append(pull.strain[i + inter] - pull.strain[i - inter])
     for i in range(len(y) - inter, len(y)):
         deriv.append((y[i] - y[i - inter]) / (x[i] - x[i - inter]))
     return deriv
@@ -147,9 +115,6 @@ def fit_expo(pull, weight):
     ## fit accroding to original data
     z = np.polyfit(pull.strain, np.log(pull.stress), 1, w = weight)
     pull['fit_e'] = e**z[1] * e**(z[0]*pull.strain)
-    ## fit accroding to subtraction of extended linear value
-    # z = np.polyfit(pull.strain, np.log(pull.stress - (pull.strain * load_lnr0[markj] + load_lnr1[markj])), 1, w = weight)
-    # pull['fit_e'] = e**z[1] * e**(z[0]*pull.strain) + pull.strain * load_lnr0[markj] + load_lnr1[markj]
     equation = [z[0], z[1]]
     return equation
 
@@ -169,10 +134,6 @@ def Rsquare(curve):
         sum_residue += (curve.stress[i] - curve.fit_e[i])**2
     r = 1 - sum_residue/sum_total
     return r
-
-# path = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/Nitro_glove_dif_rate_20g/Instron_with_Retract__03_18_2020__15_06_56_SHORT.csv'
-
-#for file in sorted(glob.glob(os.path.join(path, '*SHORT.csv'))):
 
 color = ['blue','green', 'orange', 'red', 'purple', 'black']
 n = 0
@@ -218,18 +179,7 @@ for file in sorted(glob.glob(os.path.join(repetitive10_2, '*SHORT.csv'))):
     pull = [second_pull]
     retract = [second_retract]
 
-    # target for seuqntial Instron
-    # target = [4, 8, 12, 16, 20, 20]
-    # ela_target = ['N', 2, 4, 6, 8, 10, 12, 14, 16, 18, 'N']
     ori_p = ten_p(first_pull)
-    # loop for seuqntial Instron
-
-    # loop for repetitive pulling
-    # for i in range(len(pull)):
-    #     retract[i].drop(retract[i].loc[purify_p(retract[i], 20): len(retract[i])].index, inplace=True)
-
-        # print(retract[i])
-    # first_retract.drop(first_retract.index[[purify_p(first_retract,4),len(first_retract)-1]], inplace = True)
 
     ### normalize curve
     for i in range(len(pull)):
@@ -256,8 +206,6 @@ for file in sorted(glob.glob(os.path.join(repetitive10_2, '*SHORT.csv'))):
     re_4 = fourth_retract
     re_5 = fifth_retract
 
-    # elaexpo = [ela2_epon, ela3_epon, ela4_epon, ela5_epon, ela6_epon]
-    # elalnr = [ela2_lnr, ela3_lnr, ela4_lnr, ela5_lnr, ela6_lnr]
     elaexpo = [ela2_epon]
     elalnr = [ela2_lnr]
     elaret = [re_2]
@@ -437,146 +385,6 @@ Rexpo1_std = np.std(Rexpo1_lst)
 print(Lln0_mean, Lln1_mean, Lexpo0_mean, Lexpo1_mean, Rexpo0_mean, Rexpo1_mean)
 print(R2_Lln_mean, R2_Lln_std, R2_Lexpo_mean, R2_Lexpo_std, R2_Rexpo_mean, R2_Rexpo_std)
 
-#Extra:
-# ax = plt.subplot(111)
-# blue_line = mlines.Line2D([], [], color = 'blue', label = '1˚cycle' )
-# green_line = mlines.Line2D([], [], color = 'green', label = '2˚cycle' )
-# orange_line = mlines.Line2D([], [], color = 'orange', label = '3˚cycle' )
-# black_line = mlines.Line2D([], [], color = 'black', label = '4˚cycle' )
-# ax.set(xlabel = 'strain', ylabel = 'Force (N)', title = 'Nitro-glove cyclic pulling_10mm/min')
-# ax.legend(handles = [blue_line, green_line, orange_line, black_line])
-
-# cx.scatter(elaexpo[j].strain * 100, elaexpo[j].stress - elaexpo[j].fit_e, color = color[n], s = 2)
-        # cx.set(title = 'Residue of exponential fitting', xlabel = 'Strain(%)', ylabel = 'Residue')
-
-
-            # ax.scatter(smpull[i].strain *100, smpull[i].stress,  c=derv(smpull[i], intv), cmap = map, s =1)
-            # ax.scatter(smretract[i].strain *100, smretract[i].stress,  c=derv(smretract[i], intv), cmap = map, s =2)
-            # ax.plot(retract[i].strain *100, retract[i].stress, color = color[i], linestyle = '--')
-            # original color pattern
-            # ax.plot(pull[i].strain *100, pull[i].stress)
-            # ax.plot(retract[i].strain *100, retract[i].stress, linestyle = '--')
-            # smoothed data
-            # ax.plot(smpull[i].strain *100, smpull[i].stress, color = color[i])
-            # ax.plot(smretract[i].strain *100, smretract[i].stress, color = color[i], linestyle = '--')
-            # ax.scatter(smretract[i].strain *100, smretract[i].stress, c=derv(smretract[i], intv), cmap = map, s =1)
-
-        # ax.set(xlim = [l,r],ylabel = 'Stress(MPa)', xlabel = 'Strain(%)', title = Title)
-        # ax.set(ylabel = 'Stress(MPa)', xlabel = 'Strain(%)', title = Title)
-        # ax.grid(alpha = 0.4, linestyle = '--')
-        #
-        # setting for gram y axis
-        # ax0y = ax.twinx()
-        # ax0y.set_ylabel('Load (grams)')
-        # B = -1
-        # T = 12
-        # ax0y.set(ylim=[B, T])
-        # SB = B * 0.0098 / (thickness * width * 0.001)
-        # ST = T * 0.0098 / (thickness * width * 0.001)
-        # ax.set(ylim=[SB, ST])
-
-        # a00 = plt.subplot(412)
-        # for i in range(len(pull)):
-        # unsmoothed data
-        #     a00.plot(pull[i].strain *100, derv(pull[i], intv), color = color[i])
-        #
-        # bx = plt.subplot(413)
-        # smretract = [sm2retract]
-        # for j in range(len(pull)):
-        #     weight_re = []
-        #     for i in range(len(pull[j])):
-        #         if i > int(len(pull[j]) * 0.95):
-        #             weight_re.append(1)
-        #         else:
-        #             weight_re.append(2)
-            # bx.plot(smpull[j].strain *100, derv(smpull[j], intv) , color = color[j])
-            # bx.plot(smretract[j].strain *100, derv(smretract[j], intv) , color = color[j], linestyle = '--')
-            # bx.scatter(smpull[j].strain *100, derv(smpull[j], intv) , c=derv(smpull[j], intv), cmap = map, s =1)
-            # bx.scatter(smretract[j].strain *100, smretract[j].stress , c=derv(smretract[j], intv), cmap = map, s =2)
-
-            #retract fitting and plotting
-            # fitNmnow = fit_expo(pull[j], weight_re)
-            # print(pull[j])
-            # bx.plot(pull[j].strain * 100, pull[j].stress, color = color[j])
-            # equationlist.loc[len(equationlist)] = fitNmnow
-            # bx.plot(pull[j].strain * 100, pull[j].fit_e, color = 'grey')
-
-        # bx.plot(smretract[j].strain * 100, smretract[j].stress, color = color[j], linestyle = '--')
-            # bx.scatter(smretract[j].strain , derv(smretract[j], intv) , c=derv(smretract[j], intv), cmap = map, s =1)
-
-        # bx.set(ylabel = 'Derivative (MPa)', xlabel = 'Strain(%)')
-        # bx.set(ylim = [10**-2, 10**1.05],ylabel = 'Stress(MPa)', xlabel = 'Strain(%)')
-        # bx.grid(alpha=0.4, linestyle='--')
-        # bx.set_yscale('log')
-
-        # residue plotting
-        # dx = plt.subplot(414)
-        # for j in range(len(pull)):
-            # dx.plot(smretract[j].strain *100, derv(smretract[j], intv) , color = color[j], linestyle = '--')
-            # dx.plot(pull[j].strain *100, (pull[j].stress - pull[j].fit_e))
-        #     dx.scatter(smpull[j].strain * 100, dervuni(np.log(smpull[j].stress), smpull[j].strain, intv),
-        #                c=derv(smpull[j], intv), cmap=map, s=2)
-        #     dx.scatter(smretract[j].strain * 100, dervuni(np.log(smretract[j].stress), smretract[j].strain, intv),
-        #                c=derv(smretract[j], intv), cmap=map, s=2)
-            # dx.plot(smpull[j].strain * 100, dervuni(np.log(smpull[j].stress), smpull[j].strain, intv), color = color[j])
-            # dx.plot(smretract[j].strain * 100, dervuni(np.log(smretract[j].stress), smretract[j].strain, intv), color = color[j],linestyle = '--')
-            # dx.plot(smpull[j].strain *100, smpull[j].stress, color = color[j])
-            # dx.scatter(smpull[j].strain * 100, smpull[j].stress, c=derv(smpull[j], intv), cmap=map, s=1)
-            # dx.scatter(smretract[j].strain * 100, smretract[j].stress, c=derv(smretract[j], intv), cmap=map, s=1)
-        #
-        # dx.set(ylabel = 'Derivative (MPa)', xlabel = 'Strain(%)')
-        # dx.grid(alpha=0.4, linestyle='--')
-        # dx.set(ylim = [10**-2, 10**1.05], ylabel = 'Stress (MPa)', xlabel = 'Strain(%)')
-        # dx.set_yscale('log')
-
-        # dx.set(ylim = [-10,300])
-        # bx2 = bx.twiny()
-        # bx2.set(xlim = [l*0.01*5000/400*1.18, r*0.01*5000/400*1.18], xlabel = 'recording time(s)')
-        #
-        # cx = plt.subplot(312)
-        #
-        # for j in range(len(smpull)):
-        #     cx.scatter(smpull[j].strain *100, derv(smpull[j], intv), c=derv(smpull[j], intv), cmap = map, s =2)
-            # cx.scatter(smretract[j].strain *100, derv(smretract[j], intv), c=derv(smretract[j], intv), cmap = map, s =2)
-            # cx.plot(smpull[j].strain *100, derv(smpull[j], intv), color = color[j])
-            # cx.plot(smretract[j].strain *100, derv(smretract[j], intv), color = color[j], linestyle = '--')
-            # cx.scatter(smretract[j].stress , derv(smretract[j], intv) , c=derv(smretract[j], intv), cmap = map, s =2)
-
-        # cx.set(ylim = [-5,130], xlabel = 'Strain(%)', ylabel = 'Derivative(MPa)')
-        # cx.grid(alpha = 0.4, linestyle = '--')
-
-
-
-    # when we plot loading and unloading curve separatly
-    #     dx = plt.subplot(313)
-
-
-
-
-        # for j in range(len(smpull)):
-            # dx.plot(smpull[j].strain * 100, derv(smpull[j], intv), color=color[j])
-            # dx.plot(smretract[j].strain * 100, derv(smretract[j], intv), color=color[j], linestyle='--')
-            # bx.scatter(smretract[j].strain , derv(smretract[j], intv) , c=derv(smretract[j], intv), cmap = map, s =2)
-
-        # dx.set(xlim = [l,r], ylabel='Derivative(MPa)', xlabel='Strain(%)')
-        # dx.grid(alpha=0.4, linestyle='--')
-        #
-        # dx2 = dx.twiny()
-        # dx2.set_xlim([l*0.01*5000/400*1.18, r*0.01*5000/400*1.18])
-        # dx2.set_xlabel('recording time(s)')
-
-        # ax = plt.subplot(111)
-        # blue_line = mlines.Line2D([], [], color = 'blue', label = '1˚cycle' )
-        # green_line = mlines.Line2D([], [], color = 'green', label = '2˚cycle' )
-        # orange_line = mlines.Line2D([], [], color = 'orange', label = '3˚cycle' )
-        # red_line = mlines.Line2D([], [], color = 'red', label = '4˚cycle' )
-        # purple_line = mlines.Line2D([], [], color = 'purple', label = '5˚cycle' )
-        # black_line = mlines.Line2D([], [], color = 'black', label = '6˚cycle' )
-        # ax.set(xlabel = 'strain', ylabel = 'Force (N)', title = 'Nitro-glove cyclic pulling_10mm/min')
-        # ax.legend(handles = [blue_line, green_line, orange_line, red_line, purple_line, black_line], prop={'size': 6})
-
-    # n += 1
-    # plt.savefig(''f'{output}/Elastic_fitting.pdf', transparent = True)
 
 
 
