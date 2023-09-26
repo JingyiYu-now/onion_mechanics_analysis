@@ -11,13 +11,14 @@ mpl.rcParams['ps.fonttype'] = 42
 mpl.rcParams['font.family'] = 'Avenir'
 plt.rcParams['font.size'] = 15
 plt.rcParams['axes.linewidth'] = 2
-mpl.rcParams['xtick.major.size'] = 5
-mpl.rcParams['xtick.major.width'] = 2
-mpl.rcParams['ytick.major.size'] = 5
-mpl.rcParams['ytick.major.width'] = 2
+# mpl.rcParams['xtick.major.size'] = 5
+# mpl.rcParams['xtick.major.width'] = 2
+# mpl.rcParams['ytick.major.size'] = 5
+# mpl.rcParams['ytick.major.width'] = 2
+plt.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False, right=False, left=False, labelleft=False)
 mpl.use('macosx')
 fig = mpl.pyplot.gcf()
-fig.set_size_inches(12.8, 4.8)
+fig.set_size_inches(6.4, 5.5)
 
 thickness = 7
 width = 3
@@ -33,7 +34,7 @@ Title = 'Cyclic loading to 10g'
 folder = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Trial_7.28.20/3mmmin'
 folder2 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/repetitive pulling_8.1.20/20g'
 folder3 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Onion2_10+_8.18.20/Video'
-file = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Trial_7.28.20/3mm_min/Sequential_Instron_With_Retracts__07_28_2020__15_48_33_SHORT.csv'
+file = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Trial_7.28.20/3mmmin/example'
 repetitive20 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/Strain_rate_dependency/10mm'
 repetitive10 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/repetitive pulling_8.1.20/10g'
 repetitive10_2 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/SeqInstronWRetract/repetitive_pulling_10g_3mpm_10.6.20'
@@ -145,7 +146,7 @@ def ten_ind(pull):
 
 color = ['blue','green', 'orange', 'red', 'purple', 'black']
 n = 1
-for file in sorted(glob.glob(os.path.join(repetitive10_2, '*SHORT.csv'))):
+for file in sorted(glob.glob(os.path.join(file, '*SHORT.csv'))):
     whole_df = pd.read_table(file,
                          delimiter=',',
                          header=None,
@@ -253,7 +254,7 @@ for file in sorted(glob.glob(os.path.join(repetitive10_2, '*SHORT.csv'))):
 
     #summary = pd.concat([summary, new_data],axis = 1)
     map = 'Paired'
-    ax = plt.subplot(121)
+    ax = plt.subplot(111)
     # for i in range(len(pull)):
 # for only first two cycle
     for i in range(len(smretract)):
@@ -271,24 +272,26 @@ for file in sorted(glob.glob(os.path.join(repetitive10_2, '*SHORT.csv'))):
         # ax.scatter(smretract[i].strain *100, smretract[i].stress, c=derv(smretract[i], intv), cmap = map, s =1)
 
     # ax.set(xlim = [l,r],ylabel = 'Stress(MPa)', xlabel = 'Strain(%)', title = Title)
-    ax.set(ylabel = 'Stress(MPa)', xlabel = 'Strain(%)', title = Title)
+    ax.set(ylabel = 'Stress', xlabel = 'Strain')
     # ax.grid(alpha = 0.4, linestyle = '--')
 
     # setting for gram y axis
-    ax0y = ax.twinx()
-    ax0y.set_ylabel('Load (mN)', rotation = 270, va = 'bottom')
-    B = -1 * 9.8
-    T = 12 * 9.8
-    ax0y.set(ylim=[B, T])
-    SB = B * 0.001 / (thickness * width * 0.001)
-    ST = T * 0.001 / (thickness * width * 0.001)
-    ax.set(ylim=[SB, ST])
+    # ax0y = ax.twinx()
+    # ax0y.set_ylabel('Load (mN)', rotation = 270, va = 'bottom')
+    # B = -3 * 9.8
+    # T = 22 * 9.8
+    # ax0y.set(ylim=[B, T])
+    # SB = B * 0.001 / (thickness * width * 0.001)
+    # ST = T * 0.001 / (thickness * width * 0.001)
+    # ax.set(ylim=[SB, ST])
+    ax.set(ylim=[-1.5, 10])
 
+
+#
+    # bx = plt.subplot(122)
     #
-    bx = plt.subplot(122)
-    #
-    for j in range(len(smpull)):
-        bx.plot(smpull[j].strain *100, derv(smpull[j], intv) , color = color[j])
+    # for j in range(len(smpull)):
+    #     bx.plot(smpull[j].strain *100, derv(smpull[j], intv) , color = color[j])
         # bx.plot(smretract[j].strain *100, derv(smretract[j], intv) , color = color[j], linestyle = '--')
         # bx.scatter(smpull[j].strain *100, derv(smpull[j], intv) , c=derv(smpull[j], intv), cmap = map, s =1)
         # bx.scatter(smretract[j].strain *100, smretract[j].stress , c=derv(smretract[j], intv), cmap = map, s =2)
@@ -296,14 +299,14 @@ for file in sorted(glob.glob(os.path.join(repetitive10_2, '*SHORT.csv'))):
         # bx.plot(smretract[j].strain * 100, smretract[j].stress, color = color[j], linestyle = '--')
         # bx.scatter(smretract[j].strain , derv(smretract[j], intv) , c=derv(smretract[j], intv), cmap = map, s =1)
 
-    bx.set(ylabel = 'Modulus (MPa)', xlabel = 'Strain(%)')
+    # bx.set(ylabel = 'Modulus (MPa)', xlabel = 'Strain(%)')
     # bx.set(ylim = [10**-2, 10**1.05],ylabel = 'Stress(MPa)', xlabel = 'Strain(%)')
     # bx.grid(alpha=0.4, linestyle='--')
     # bx.set_yscale('log')
 
     # dx = plt.subplot(313)
-    for j in range(len(smretract)):
-        bx.plot(smretract[j].strain *100, derv(smretract[j], intv) , color = color[j], linestyle = '--')
+    # for j in range(len(smretract)):
+    #     bx.plot(smretract[j].strain *100, derv(smretract[j], intv) , color = color[j], linestyle = '--')
 
     #     dx.scatter(smpull[j].strain * 100, dervuni(np.log(smpull[j].stress), smpull[j].strain, intv),
     #                c=derv(smpull[j], intv), cmap=map, s=2)
@@ -364,15 +367,20 @@ for file in sorted(glob.glob(os.path.join(repetitive10_2, '*SHORT.csv'))):
     purple_line = mlines.Line2D([], [], color = 'purple', label = '5˚cycle' )
     black_line = mlines.Line2D([], [], color = 'black', label = '6˚cycle' )
     # ax.set(xlabel = 'strain', ylabel = 'Force (N)', title = 'Nitro-glove cyclic pulling_10mm/min')
-    ax.legend(handles = [blue_line, green_line, orange_line, red_line, purple_line, black_line], loc = 2, fontsize=10, frameon = False)
-    bx.legend(handles = [blue_line, green_line, orange_line, red_line, purple_line, black_line], loc = 2, fontsize=10, frameon = False)
+    # ax.legend(handles = [blue_line, green_line, orange_line, red_line, purple_line, black_line], loc = 2, fontsize=10, frameon = False)
+    # bx.legend(handles = [blue_line, green_line, orange_line, red_line, purple_line, black_line], loc = 2, fontsize=10, frameon = False)
 
     n += 1
-    plt.gcf().subplots_adjust(bottom=0.2, wspace= 0.4)
+    plt.gcf().subplots_adjust(bottom=0.2, right = 0.85)
     fig = plt.gcf()
     size = fig.get_size_inches()
     print(size)
-    plt.savefig(''f'{output}/Repetitive_pulling.pdf', transparent = True)
+    # plt.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
+    # ax0y.axis('off')
+    fig.set_size_inches(6.4, 5.5)
+    ax.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False, right=False, left=False, labelleft=False)
+    # ax0y.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False, right=False, left=False, labelleft=False)
+    # plt.savefig(''f'{output}/Seq_cyclic_para_diagram.pdf', transparent = True)
 
     plt.show()
 

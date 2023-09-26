@@ -49,18 +49,6 @@ UPEG = [PEG1, PEG2, PEG3]
 UReH = [Reh1, Reh2, Reh3]
 group = [Ucon, UPEG]
 
-# total = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_seq_instron/4,8,12,16,20_sequence/Total_3onion'
-# folder4 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_seq_instron/4,8,12,16,20_sequence/seq_Onion_10'
-# folder5 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_seq_instron/4,8,12,16,20_sequence/Onion_6.23.20_9'
-# group = [folder1, folder2, folder3, folder4, folder5]
-
-# 8,12,16,20,24 sequence
-seq1 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_seq_instron/8,12,16,20,24_sequence/Onion1'
-seq2 = '/Users/jingyiyu/Documents/Cosgrovelab/Onion_mechanics/5th_seq_instron/8,12,16,20,24_sequence/onion2_10'
-
-name = 'Onion4'
-# file = ''f'{folder}/Sequential_Instron__02_15_2020__14_30_58_SHORT.csv'
-# output = ''f'{folder1}/summary1.csv'
 
 thickness = 7
 width = 3
@@ -129,17 +117,11 @@ def smooth(pull,f):
 def norm(pull):
     # strain calculated based on very original length (before plastic deformation)
     ori_p = ten_p(first_pull)
-    # strain calculated based on length at the beginning of each pull
-    # ori_p = ten_p(pull)
-
     pull['force_N'] = pull.load * 0.0098
 
     # engineering stress & strain
     pull['stress'] = pull.force_N / (thickness * width * 0.001)
     pull['strain'] = (pull.position - ori_p) / (5000 + ori_p)
-    # true stress & strain
-    # pull['strain'] = np.log(1 + (pull.position - ori_p) / (ori_p + 4500) )
-    # pull['stress'] = pull.force_N/(thickness * width * (ori_p + 4500) / (pull.position + 4500) * 0.001)
 
 def purify_p(pull, target):
     for i in range(len(pull)):
@@ -163,38 +145,24 @@ def purify_revrs(pull):
 def fit(pull, percentage, target_load):
     if target_load == 'N':
         fitting_part = pull[int(len(pull) * (100 - percentage) / 100):].reset_index(drop=True)
-        # fit using gram as unit
-        # z = np.polyfit(fitting_part.position, fitting_part.load, 1)
-
         # fit using stress (MPa)
         z = np.polyfit(fitting_part.strain, fitting_part.stress, 1)
         pull['fit_e'] = pull.strain * z[0] + z[1]
     else:
         cutted_data = pull[:ten_ind(pull, target_load)].reset_index(drop=True)
         fitting_part = cutted_data[int(len(cutted_data) * (100 - percentage) / 100):].reset_index(drop=True)
-        # fit using gram as unit
-        # z = np.polyfit(fitting_part.position, fitting_part.load, 1)
-
         # fit using stress (MPa)
         z = np.polyfit(fitting_part.strain, fitting_part.stress, 1)
         pull['fit_e'] = pull.strain * z[0] + z[1]
-    # Xm = np.median(fitting_part.position)
-    # compliance = 100 / (4500 + Xm) / z[0]
     modulus = z[0]
     return modulus
 
 def fit_p(pull, p_pull, percentage):
     cutted_data = pull[pull.strain < np.max(p_pull.strain)].reset_index(drop=True)
     fitting_part = cutted_data[int(len(cutted_data) * (100 - percentage) / 100):].reset_index(drop=True)
-    # fit using gram as unit
-    # z = np.polyfit(fitting_part.position, fitting_part.load, 1)
-
     # fit using stress (MPa)
     z = np.polyfit(fitting_part.strain, fitting_part.stress, 1)
     pull['fit_e'] = pull.strain * z[0] + z[1]
-
-    # Xm = np.median(fitting_part.position)
-    # modulus = 100 / (4500 + Xm) / z[0]
     modulus = z[0]
     return modulus
 
@@ -202,10 +170,6 @@ def fit_expo(pull, weight):
     ## fit accroding to original data
     z = np.polyfit(pull.strain, np.log(pull.stress), 1, w = weight)
     pull['fit_e'] = e**z[1] * e**(z[0]*pull.strain)
-    ## fit accroding to subtraction of extended linear value
-    # z = np.polyfit(pull.strain, np.log(pull.stress - (pull.strain * load_lnr_0.loc[f,loadx[markj-1]] + load_lnr_1.loc[f,loadx[markj-1]])), 1, w = weight)
-    # pull['fit_e'] = e**z[1] * e**(z[0]*pull.strain) + pull.strain * load_lnr_0.loc[f,loadx[markj-1]] + load_lnr_1.loc[f,loadx[markj-1]]
-
     equation = [z[0], z[1]]
     return equation
 
@@ -213,9 +177,6 @@ def fit_expo_l(pull, weight):
     ## fit accroding to original data
     z = np.polyfit(pull.strain, np.log(pull.stress), 1, w = weight)
     pull['fit_e'] = e**z[1] * e**(z[0]*pull.strain)
-    ## fit accroding to subtraction of extended linear value
-    # z = np.polyfit(pull.strain, np.log(pull.stress - (pull.strain * load_lnr_0.loc[f,loadx[markj-1]] + load_lnr_1.loc[f,loadx[markj-1]])), 1, w = weight)
-    # pull['fit_e'] = e**z[1] * e**(z[0]*pull.strain) + pull.strain * load_lnr_0.loc[f,loadx[markj-1]] + load_lnr_1.loc[f,loadx[markj-1]]
 
     equation = [z[0], z[1]]
     return equation
@@ -278,15 +239,6 @@ say2.set_ylabel('Loading exponent', rotation=270, va='bottom')
 # sa2.set_xticklabels(xlabel)
 
 for unit in group:
-#
-#     # create data frame for results from each property
-#     t_modulus = pd.DataFrame(columns=loadx)
-#     e_modulus = pd.DataFrame(columns=loadx)
-#     r_modulus = pd.DataFrame(columns=loadx)
-#     # t_inc_comp = pd.DataFrame(columns=loadx)
-#     # e_inc_comp = pd.DataFrame(columns=loadx)
-#     # r_inc_comp = pd.DataFrame(columns=loadx)
-#
     if g == 0:
         style = '-'
     elif g == 1:
@@ -360,7 +312,6 @@ for unit in group:
             ela5_epon = fifth_pull
             ela6_epon = sixth_pull
 
-
             ela1_lnr = first_pull
             ela2_lnr = second_pull
             ela3_lnr = third_pull
@@ -368,14 +319,12 @@ for unit in group:
             ela5_lnr = fifth_pull
             ela6_lnr = sixth_pull
 
-
             re_fit1 = first_retract
             re_fit2 = second_retract
             re_fit3 = third_retract
             re_fit4 = fourth_retract
             re_fit5 = fifth_retract
             re_fit6 = sixth_retract
-
 
             orip1 = copy.deepcopy(first_pull)
             orip2 = copy.deepcopy(second_pull)
@@ -391,8 +340,6 @@ for unit in group:
             orir4 = copy.deepcopy(fourth_retract)
             orir5 = copy.deepcopy(fifth_retract)
             orir6 = copy.deepcopy(sixth_retract)
-
-
 
             elaexpo = [ela1_epon, ela2_epon,ela3_epon, ela4_epon, ela5_epon, ela5_epon]
             elalnr = [ela1_lnr, ela2_lnr, ela3_lnr, ela4_lnr, ela5_lnr, ela6_lnr]
@@ -417,11 +364,8 @@ for unit in group:
 
                 elaexpo[i] = pull[i].loc[int(len(pull[i])*0.35):int(len(pull[i])*0.88)]
 
-
                 retract[i].reset_index(inplace=True)
                 rmindex = []
-                # purify_revrs(retract[i])
-                # retract[i].drop(retract[i].loc[rmindex].index, inplace=True)
                 retract_fit[i] = retract[i].loc[int(len(retract[i])*0.2):int(len(retract[i])*0.95)]
 
                 retract_fit[i] = retract_fit[i].reset_index(drop=True)
@@ -441,11 +385,6 @@ for unit in group:
 
         ####### plot the stress-train curve and fitting curve
 
-            # ax = plt.subplot(221)
-            # bx = plt.subplot(223)
-            # cx = plt.subplot(222)
-            # dx = plt.subplot(426)
-            # dx2 = plt.subplot(428)
             for j in range(len(retract_fit)-1):
                 weight_re = []
                 for i in range(len(retract_fit[j])):
@@ -457,30 +396,13 @@ for unit in group:
                         weight_re.append(1)
 
                 fitNmnow = fit_expo(retract_fit[j], weight_re)
-                # ax.plot(retract[j].strain * 100, retract[j].stress, color = color[j])
-                # ax.set_yscale('log')
-                # ax.set(xlabel = 'Strain(%)', ylabel = 'Stress(MPa)', title = 'Fitting of elastic retract curves')
                 retract_fit_line = mlines.Line2D([], [], color = 'grey', label = 'Exponential fitting curve')
-                # ax.legend(handles = [retract_fit_line], loc = 2, fontsize = 8)
                 retract_exp_0.loc[f,loadx[j]] = fitNmnow[0]
                 retract_exp_1.loc[f,loadx[j]] = fitNmnow[1]
-                # ax.plot(retract_fit[j].strain * 100, retract_fit[j].fit_e, color = 'grey')
-                # bx.scatter(retract_fit[j].strain * 100, (retract_fit[j].stress - retract_fit[j].fit_e)/retract_fit[j].stress *100, color = color[j], s=2)
-                # bx.set(title = 'Residue of exponential fitting', xlabel = 'Strain(%)', ylabel = 'Residue (%)')
 
 
 
-                # ax.grid(alpha=0.4, linestyle='--')
-                # bx.grid(alpha=0.4, linestyle='--')
-                # cx.grid(alpha=0.4, linestyle='--')
-                # dx.grid(alpha=0.4, linestyle='--')
-                # dx2.grid(alpha=0.4, linestyle='--')
-
-
-            # for j in range(len(elaexpo)):
             for j in range(1, len(loadx)+1):
-                # cx.plot(pull[j].strain * 100, pull[j].stress, color = color[j])
-                # cx.set(xlabel = 'Strain(%)', ylabel = 'Stress(MPa)', title = 'Fitting of elastic loading curves')
 
                 weight_re = []
                 for i in range(len(elalnr[j])):
@@ -490,15 +412,10 @@ for unit in group:
                         weight_re.append(1)
 
                 fitl = (fit_linear(elalnr[j], weight_re))
-                # print(fitNmnow)
                 load_lnr_0.loc[f,loadx[j-1]] = fitl[0]
                 load_lnr_1.loc[f,loadx[j-1]] = fitl[1]
-                # cx.plot(elalnr[j].strain * 100, elalnr[j].fit_e, color = 'black')
-                # dx.scatter(elalnr[j].strain * 100, (elalnr[j].stress - elalnr[j].fit_e)/elalnr[j].stress *100 ,color = color[j], s=2)
-                # dx.set(title = 'Residue of linear fitting', xlabel = 'Strain(%)', ylabel = 'Residue (%)')
                 load_expo_line = mlines.Line2D([], [], color = 'grey', label = 'Exponential fitting curve')
                 load_lnr_line = mlines.Line2D([], [], color = 'black', label = 'Linear fitting curve')
-                # cx.legend(handles = [load_lnr_line, load_expo_line], loc = 2, fontsize = 8)
 
             for j in range(1, len(loadx)+1):
                 weight_re = []
@@ -513,27 +430,23 @@ for unit in group:
                 load_exp_0.loc[f,loadx[j-1]] = fitNmnow[0]
                 load_exp_1.loc[f,loadx[j-1]] = fitNmnow[1]
                 print(load_exp_0)
-                # cx.plot(elaexpo[j].strain * 100, elaexpo[j].fit_e, color = 'grey')
-                # dx2.scatter(elaexpo[j].strain * 100, (elaexpo[j].stress - elaexpo[j].fit_e)/elaexpo[j].stress *100, color = color[j], s = 2)
-                # dx2.set(title = 'Residue of exponential fitting', xlabel = 'Strain(%)', ylabel = 'Residue (%)')
 
             # plt.show()
             fig.set_size_inches(8, 6)
 
-            # master = plt.subplot(111)
+            master = plt.subplot(111)
             lw = 2
-            # for i in range(len(retract)):
-            #     # master.plot(orir[i].strain *100, orir[i].stress, color = color[i],linestyle = '--', linewidth = lw)
-            #     # master.plot(orip[i].strain *100, orip[i].stress, color = color[i], linewidth = lw)
-            # for i in range(len(retract_fit)-1):
-            #     # master.plot(retract_fit[i].strain *100, retract_fit[i].fit_e, color = 'grey', linewidth = lw)
-            # for i in range(1,len(elalnr)):
-            #     # master.plot(elalnr[i].strain *100, elalnr[i].fit_e, color = 'black', linewidth = lw)
-            # for i in range(2,len(elaexpo)):
-            #     # master.plot(elaexpo[i].strain *100, elaexpo[i].fit_e, color = 'grey', linewidth = lw)
+            for i in range(len(retract)):
+                master.plot(orir[i].strain *100, orir[i].stress, color = color[i],linestyle = '--', linewidth = lw)
+                master.plot(orip[i].strain *100, orip[i].stress, color = color[i], linewidth = lw)
+            for i in range(len(retract_fit)-1):
+                master.plot(retract_fit[i].strain *100, retract_fit[i].fit_e, color = 'grey', linewidth = lw)
+            for i in range(1,len(elalnr)):
+                master.plot(elalnr[i].strain *100, elalnr[i].fit_e, color = 'black', linewidth = lw)
+            for i in range(2,len(elaexpo)):
+                master.plot(elaexpo[i].strain *100, elaexpo[i].fit_e, color = 'grey', linewidth = lw)
             # master.set(xlabel = 'Strain(%)', ylabel = 'Stress(MPa)', title = 'Fitting of elastic curves')
             # master.grid(alpha=0.4, linestyle='--')
-            # experiment =
             load_expo_line = mlines.Line2D([], [], color = 'grey', label = 'Exponential fitting curve')
             load_lnr_line = mlines.Line2D([], [], color = 'black', label = 'Linear fitting curve')
             # master.legend(handles = [load_lnr_line, load_expo_line], loc = 2, fontsize=10, frameon = False)
@@ -541,47 +454,26 @@ for unit in group:
             print(f)
             f += 1
             # plt.gcf().subplots_adjust(bottom=0.12, right = 0.8)
-
             # plt.savefig(''f'{output}/Seq_cyclic_fitting_master.pdf', transparent = True)
 
             # plt.show()
-# print(load_lnr_0)
 
-
-    # sa2 = plt.subplot(212)
-    # sb = plt.subplot(212)
     R_0 = []
-    R_1 = []
     L_l0 = []
-    L_l1 = []
     L_e0 = []
-    L_e1 = []
     R_0ero = []
-    R_1ero = []
     L_l0ero = []
-    L_l1ero = []
     L_e0ero = []
-    L_e1ero = []
     for i in range(len(loadx)):
         R_0.append(np.mean(retract_exp_0.iloc[:, i]))
-        # R_1.append(np.mean(retract_exp_1.iloc[:, i]))
         L_l0.append(np.mean(load_lnr_0.iloc[:, i]))
-        # L_l1.append(np.mean(load_lnr_1.iloc[:, i]))
 
         R_0ero.append(np.std(retract_exp_0.iloc[:, i]))
-        # R_1ero.append(np.std(retract_exp_1.iloc[:, i]))
         L_l0ero.append(np.std(load_lnr_0.iloc[:, i]))
-        # L_l1ero.append(np.std(load_lnr_1.iloc[:, i]))
 
         L_e0.append(np.mean(load_exp_0.iloc[:, i]))
-        # L_e1.append(np.std(load_exp_1.iloc[:, i]))
         L_e0ero.append(np.std(load_exp_0.iloc[:, i]))
-        # L_e1ero.append(np.std(load_exp_1.iloc[:, i]))
-    # print(len(load_exp_1))
 
-    # plot as stress
-    # x = [a * 0.098 /3/7/0.01 for a in loadx]
-    # x_expo = [a * 0.098 /3/7/0.01 for a in loadx_lexpo]
 
     ms = 4
     lw = 2
@@ -590,34 +482,17 @@ for unit in group:
     sa.errorbar(loadx, L_l0, yerr = L_l0ero, color='black', marker = mark, markersize = ms, linewidth = lw, capsize=5, markeredgewidth= lw, linestyle = style)
     say2.errorbar(loadx, L_e0, yerr = L_e0ero, color='gray', marker = mark, markersize = ms, linewidth = lw, capsize=5, markeredgewidth= lw, linestyle = style, alpha = 0.8)
 
-    # ax.set(xlabel='loading (g)', ylabel='Modulus(MPa)', title='Sequential modulus')
     t_line = mlines.Line2D([], [], color = 'C7', label = 'Retract expo base')
-    # green_line = mlines.Line2D([], [], color = 'C7', label = 'Retract expo intercept', linestyle = '--')
     orange_line = mlines.Line2D([], [], color = 'C9', label = 'Load linear slope')
-    # fr_line = mlines.Line2D([], [], color = 'C9', label = 'Load linear intercept', linestyle = '--')
     blue_line = mlines.Line2D([], [], color = 'C3', label = 'Load expo base')
-    # C_line = mlines.Line2D([], [], color = 'C3', label = 'Load expo intercept', linestyle = '--')
-
-    # sa.legend(handles = [orange_line, blue_line], loc = 1, fontsize=10, frameon = False)
-    # sa2.legend(handles = [orange_line, blue_line], loc = 1, fontsize=10, frameon = False)
 
     g += 1
 
     # plt.show()
-# sa2.legend(handles = [t_line], loc = 1, fontsize=10, frameon = False)
-# sa2.set(xlabel = 'Strain (%)')
-# sa2.set_xticks(loadx)
-# sa2.set_xticklabels(loadx)
-# sa.set_yscale('log')
-# sb.legend(handles = [green_line, fr_line, C_line], loc = 1, fontsize = 8)
-# sb.set(title = 'Secondary parameters', ylim = [-7,5], xlabel = 'Loading (g)')
-# sb.set_xticks(loadx)
-# sb.set_xticklabels(loadx)
-# ax.grid(alpha=0.4, linestyle='--')
-# plt.gcf().subplots_adjust(bottom=0.12, right = 0.935, top = 0.88, hspace = 0.2)
+
 plt.gcf().subplots_adjust(bottom=0.15)
 plt.gcf().set_size_inches(6, 5.5)
-plt.savefig(''f'{output}/PEG_loading_fit.pdf', transparent = True)
+# plt.savefig(''f'{output}/PEG_loading_fit.pdf', transparent = True)
 
 plt.show()
 

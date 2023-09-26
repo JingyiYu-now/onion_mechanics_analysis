@@ -352,7 +352,7 @@ for folder in group:
         # bx.set_xticklabels([loadx[1], loadx[2], loadx[3], loadx[4]])
         # bx.set(xlabel='loading (g)', ylabel='Incremental Compliance(∆L%/MPa)', title='Incremental Compliance_' + name)
 
-plt.savefig(''f'{output}/Strain_modulus_seq.pdf', transparent = True)
+# plt.savefig(''f'{output}/Strain_modulus_seq.pdf', transparent = True)
 plt.show()
 
 
