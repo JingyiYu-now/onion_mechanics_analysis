@@ -1,4 +1,4 @@
-# script: Plot the stress-strain curve and modulus-strain curve
+# script: Plot the stress-strain curve and modulus-strain curve for representative s-s curve and all curves
 # Fig 1 A, B use group2 for input
 # Fig S1 use group 1 for input
 
@@ -56,7 +56,6 @@ def ind(df, value):
         if df.position[i] == value:
             return i
 
-
 # define a function that find the position where peels are under tension ( constant > 0.1g )
 def ten_p(pull):
     for i in range(len(pull) - 5):
@@ -65,7 +64,6 @@ def ten_p(pull):
             point = pull.position[i]
             return point
 
-
 # define a function that calculate the stress and strain of the curve
 def norm(pull):
     ori_p = ten_p(pull)
@@ -73,13 +71,6 @@ def norm(pull):
     ## engineering stress/strain
     pull['stress'] = pull.force / (thickness * width * 0.001)
     pull['strain'] = (pull.position - ori_p) / (5000 + ori_p)
-    ## Convert to true stress,strain
-    # pull['stress'] = pull.force/(thickness * width * 5000 / (pull.position + 5000) * 0.001)
-    # pull['strain'] = np.log(1 + (pull.position - ori_p) / 5000)
-
-    # pull['T_strain'] = np.log(1 + pull['strain'])
-    # pull['T_stress'] = pull.force/(thickness * width * (ori_p + 4500) / (pull.position + 4500) * 0.001)
-
 
 # define a function that smooth the curve
 def smooth(pull):
@@ -98,21 +89,13 @@ def derv(pull, inter):
     for i in range(inter):
         # stress
         deriv.append((pull.stress[i + inter] - pull.stress[i]) / (pull.strain[i + inter] - pull.strain[i]))
-        # load
-        # deriv.append((pull.load[i + inter] - pull.load[i]) / (pull.strain[i + inter] - pull.strain[i]))
     for i in range(inter, len(pull) - inter):
         # stress
         deriv.append(
             (pull.stress[i + inter] - pull.stress[i - inter]) / (pull.strain[i + inter] - pull.strain[i - inter]))
-        # interval.append(pull.strain[i + inter] - pull.strain[i - inter])
-        # load
-        # deriv.append(
-        #     (pull.load[i + inter] - pull.load[i - inter]) / (pull.strain[i + inter] - pull.strain[i - inter]))
     for i in range(len(pull) - inter, len(pull)):
         # stress
         deriv.append((pull.stress[i] - pull.stress[i - inter]) / (pull.strain[i] - pull.strain[i - inter]))
-        # load
-        # deriv.append((pull.load[i] - pull.load[i - inter]) / (pull.strain[i] - pull.strain[i - inter]))
     return deriv
 
 ax0 = plt.subplot(121)
