@@ -134,11 +134,6 @@ for file in sorted(glob.glob(os.path.join(RT, '*SHORT.csv'))):
         twlveth_retract = whole_df[ind(whole_df, 'SIXTH RETRACT') + 1:].astype(float).iloc[::-1].reset_index(drop=True)
 
 
-        # pull = [first_pull, second_pull, third_pull, fourth_pull, fifth_pull, sixth_pull, seventh_pull, eighth_pull, ninth_pull, tenth_pull, eleventh_pull, twlveth_pull]
-        # retract = [first_retract, second_retract, third_retract, fourth_retract, fifth_retract, sixth_retract, seventh_retract, eighth_retract, ninth_retract, tenth_retract, eleventh_retract, twlveth_retract]
-        # pull = [first_pull, second_pull, third_pull, fourth_pull, fifth_pull, seventh_pull, eighth_pull, ninth_pull, tenth_pull, eleventh_pull, twlveth_pull]
-        # retract = [first_retract, second_retract, third_retract, fourth_retract, fifth_retract, seventh_retract, eighth_retract, ninth_retract, tenth_retract, eleventh_retract, twlveth_retract]
-
         pre_p = [first_pull, second_pull, third_pull, fourth_pull, fifth_pull, sixth_pull, seventh_pull]
         pre_r = [first_retract, second_retract, third_retract, fourth_retract, fifth_retract, sixth_retract, seventh_retract]
         rate_p = [eighth_pull, ninth_pull, tenth_pull, eleventh_pull, twlveth_pull]
