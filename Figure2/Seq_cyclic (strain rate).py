@@ -142,9 +142,6 @@ for file in sorted(glob.glob(os.path.join(RT, '*SHORT.csv'))):
         print(ten_p(first_pull), ten_p(second_pull), ten_p(third_pull), ten_p(fourth_pull), ten_p(fifth_pull), ten_p(sixth_pull), ten_p(seventh_pull))
         print(ten_p(eighth_pull), ten_p(ninth_pull), ten_p(tenth_pull), ten_p(eleventh_pull), ten_p(twlveth_pull))
 
-        # pull = [first_pull, second_pull]
-        # retract = [first_retract, second_retract]
-
         ### normalize curve
         for i in range(len(pre_p)):
             norm(pre_p[i])
@@ -184,13 +181,6 @@ for file in sorted(glob.glob(os.path.join(RT, '*SHORT.csv'))):
         smrate_p = [sm8pull, sm9pull, sm10pull, sm11pull, sm12pull]
         smrate_r = [sm8retract, sm9retract, sm10retract, sm11retract, sm12retract]
 
-
-        # calculate the original position shift of the curve
-        # step = [0]
-        # for i in range(len(pull)):
-        #     if i > 0:
-        #         step.append((ten_p(pull[i]) - ten_p(pull[0])) / 5000)
-
         for j in range(len(pre_p)):
             a.plot(pre_p[j].strain *100, pre_p[j].stress, color='grey', alpha = 0.6, linewidth = lw)
             a.plot(pre_r[j].strain *100, pre_r[j].stress, color='grey', linestyle = '--', alpha = 0.6, linewidth = lw)
@@ -198,98 +188,7 @@ for file in sorted(glob.glob(os.path.join(RT, '*SHORT.csv'))):
             a.plot(rate_p[j].strain *100, rate_p[j].stress, color= color[j], linewidth = lw)
             a.plot(rate_r[j].strain *100, rate_r[j].stress, color=color[j], linestyle='--', linewidth = lw)
 
-        # for derivative calculation
-        # b = plt.subplot(212)
-        # for j in range(len(pre_p)):
-        #     b.plot(smpre_p[j].strain *100, derv(smpre_p[j], intv), color='grey', alpha = 0.4)
-        #     b.plot(smpre_r[j].strain *100, derv(smpre_r[j],intv),  color='grey', linestyle = '--', alpha = 0.4)
-        # for j in range(len(rate_p)):
-        #     b.plot(smrate_p[j].strain *100, derv(smrate_p[j],intv), color= color[j])
-        #     b.plot(smrate_r[j].strain *100, derv(smrate_r[j],intv), color=color[j], linestyle='--')
-
-        # loop for seuqntial Instron
-        # for i in range(len(pull)):
-        #     retract[i].drop(retract[i].loc[purify_p(retract[i], target[i]): len(retract[i])].index, inplace = True)
-        #     retract[i].drop(retract[i].loc[0:ten_ind(retract[i])].index, inplace = True)
-        #
-        #     retract[i].reset_index(inplace = True)
-        #     rmindex = []
-        #     purify_revrs(retract[i])
-        #     retract[i].drop(retract[i].loc[rmindex].index, inplace = True)
-        #
-        #     pull[i].drop(pull[i].loc[0:ten_ind(pull[i])].index, inplace = True)
-        #     retract[i].reset_index(inplace = True)
-        #     pull[i].reset_index(inplace=True)
-        # loop for repetitive pulling
-        # for i in range(len(pull)):
-        #     retract[i].drop(retract[i].loc[purify_p(retract[i], 20): len(retract[i])].index, inplace=True)
-
-            # print(retract[i])
-        # first_retract.drop(first_retract.index[[purify_p(first_retract,4),len(first_retract)-1]], inplace = True)
-
-        ### normalize curve
-        # for i in range(len(pull)):
-        #     norm(pull[i])
-        #     norm(retract[i])
-
-
-
-        # sm1pull = pd.DataFrame(data = smooth(first_pull,smf),columns=['strain','stress'])
-        # sm2pull = pd.DataFrame(data = smooth(second_pull,smf),columns=['strain','stress'])
-        # sm3pull = pd.DataFrame(data = smooth(third_pull,smf),columns=['strain','stress'])
-        # sm4pull = pd.DataFrame(data = smooth(fourth_pull,smf),columns=['strain','stress'])
-        # sm5pull = pd.DataFrame(data = smooth(fifth_pull,smf),columns=['strain','stress'])
-        # # sm6pull = pd.DataFrame(data = smooth(sixth_pull,smf),columns=['strain','stress'])
-        # sm7pull = pd.DataFrame(data = smooth(seventh_pull,smf),columns=['strain','stress'])
-        # sm8pull = pd.DataFrame(data = smooth(eighth_pull,smf),columns=['strain','stress'])
-        # sm9pull = pd.DataFrame(data = smooth(ninth_pull,smf),columns=['strain','stress'])
-        # sm10pull = pd.DataFrame(data = smooth(tenth_pull,smf),columns=['strain','stress'])
-        # sm11pull = pd.DataFrame(data = smooth(eleventh_pull,smf),columns=['strain','stress'])
-        # sm12pull = pd.DataFrame(data = smooth(twlveth_pull,smf),columns=['strain','stress'])
-        #
-        # sm1retract = pd.DataFrame(data=smooth(first_retract,smf), columns=['strain','stress'])
-        # sm2retract = pd.DataFrame(data=smooth(second_retract,smf), columns=['strain','stress'])
-        # sm3retract = pd.DataFrame(data = smooth(third_retract,smf),columns=['strain','stress'])
-        # sm4retract = pd.DataFrame(data = smooth(fourth_retract,smf),columns=['strain','stress'])
-        # sm5retract = pd.DataFrame(data = smooth(fifth_retract,smf),columns=['strain','stress'])
-        # # sm6retract = pd.DataFrame(data = smooth(sixth_retract,smf),columns=['strain','stress'])
-        # sm7retract = pd.DataFrame(data=smooth(seventh_retract,smf), columns=['strain','stress'])
-        # sm8retract = pd.DataFrame(data=smooth(eighth_retract,smf), columns=['strain','stress'])
-        # sm9retract = pd.DataFrame(data = smooth(ninth_retract,smf),columns=['strain','stress'])
-        # sm10retract = pd.DataFrame(data = smooth(tenth_retract,smf),columns=['strain','stress'])
-        # sm11retract = pd.DataFrame(data = smooth(eleventh_retract,smf),columns=['strain','stress'])
-        # sm12retract = pd.DataFrame(data = smooth(twlveth_retract,smf),columns=['strain','stress'])
-        #
-        # smpull = [sm1pull, sm2pull, sm3pull, sm4pull, sm5pull, sm7pull, sm8pull, sm9pull, sm10pull, sm11pull, sm12pull]
-        # smretract = [sm1retract, sm2retract, sm3retract, sm4retract, sm5retract, sm7retract, sm8retract, sm9retract, sm10retract, sm11retract, sm12retract]
-        # smpull = [sm1pull, sm2pull, sm3pull, sm4pull, sm5pull]
-        # smretract = [sm1retract, sm2retract, sm3retract, sm4retract, sm5retract]
-
-        # ela_target = ['N', 2, 4, 6, 8, 'N', 10, 12, 14, 16, 18, 'N']
-        # mo_pull = []
-        # mo_re = []
-        # for i in range(len(smpull)):
-            # retract fitting according to the percentage of the data
-            # mo_re.append(fit(smretract[i], per, 'N'))
-
-            # retract fitting according to the time/amount of data point
-            # mo_re.append(fit_d(smretract[i], num))
-            # fit according to the target load
-            # mo_pull.append(fit(smpull[i], 8, ela_target[i]))
-            # fit according to the previous position
-            # if i > 0:
-            #     mo_pull.append(fit_p(smpull[i], smpull[i-1], per))
-            # else:
-            #     mo_pull.append(fit_p(smpull[i], smpull[i], per))
-        # Pull.loc[len(Pull)] = mo_pull
-        # Retract.loc[len(Retract)] = mo_re
-        # print(mo_pull)
-        # print(mo_re)
-
-
         a.set(ylim = [-1,10], ylabel = 'Stress(MPa)', xlabel = 'Strain(%)')
-        # a.set_title('stress-strain curve for loading curve', fontsize = 10, fontweight = 'bold')
-        # a.grid(alpha = 0.4, linestyle = '--')
         # setting for gram y axis
         ay = a.twinx()
         ay.set_ylabel('Load (mN)', rotation = 270, va = 'bottom')
@@ -308,43 +207,7 @@ for file in sorted(glob.glob(os.path.join(RT, '*SHORT.csv'))):
         a.set(xlabel = 'Strain (%)', ylabel = 'Stress (MPa)')
         a.legend(handles = [grey_line, C0_line, C1_line, C2_line, C3_line, C4_line], loc = 2, fontsize=10, frameon = False)
 
-        # b = plt.subplot(122)
-        # for j in range(len(smpull)):
-            # b.plot(smretract[j].strain , smretract[j].stress, color = color[j], linestyle = '--')
-            # b.scatter(smretract[j].strain *100, smretract[j].stress, c=derv(smretract[j], intv), cmap = map, s =2)
-            # b.plot(smretract[j].strain[int(len(smretract[j]) * (100 - per) / 100):] * 100, smretract[j].fit_e[int(len(smretract[j]) * (100 - per) / 100):], color = 'black')
-            # b.plot(smretract[j].strain[int(len(smretract[j]) * (100 - per) / 100):] * 100, smretract[j].fit_e[int(len(smretract[j]) * (100 - per) / 100):], color = 'black')
-            # b.plot(smretract[j].strain[len(smretract)-num:] * 100 , smretract[j].fit_e[len(smretract)-num:], color = 'Black', linewidth = 2)
-
-        # b.set(ylim = [-1,10], ylabel = 'Stress(MPa)', xlabel = 'Strain(%)')
-        # b.set_title('stress-strain curve for retract curve', fontsize = 10, fontweight = 'bold')
-        # b.grid(alpha = 0.4, linestyle = '--')
-        # setting for gram y axis
-        # by = b.twinx()
-        # by.set_ylabel('Load (grams)')
-        # B = -1
-        # T = 21
-        # by.set(ylim=[B, T])
-        # SB = B * 0.0098 / (thickness * width * 0.001)
-        # ST = T * 0.0098 / (thickness * width * 0.001)
-        # b.set(ylim=[SB, ST])
-
-        # a0 = plt.subplot(312)
-        # for j in range(len(smpull)):
-            # a0.plot(smpull[j].strain *100, smpull[j].stress, color = color[j])
-            # a0.scatter(smpull[j].strain *100, derv(smpull[j], intv), c=derv(smpull[j], intv), cmap = map, s =2)
-            # a0.scatter(smpull[j].strain *100, smpull[j].stress, c=derv(smpull[j], intv), cmap = map, s =2)
-
-        # a0.set(ylabel = 'Stress (MPa)', xlabel = 'Strain')
-        # a0.set_title('stress-strain curve for loading curve (log)', fontsize = 10, fontweight = 'bold')
-        # a0.grid(alpha = 0.4, linestyle = '--')
-        # a0.set_yscale('log')
-
-        # b0 = plt.subplot(426)
-
         n += 1
-    # if n == 4:
-    #     break
 
 n = 0
 
