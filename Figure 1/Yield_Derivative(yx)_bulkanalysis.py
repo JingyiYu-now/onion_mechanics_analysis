@@ -77,8 +77,6 @@ def smooth(pull):
     lowess = sm.nonparametric.lowess
     # stress
     z = lowess(pull.stress, pull.strain, frac=0.025)
-    # load
-    # z = lowess(pull.load, pull.strain, frac=0.025)
     return z
 
 

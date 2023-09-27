@@ -58,18 +58,7 @@ def norm(pull):
     ## stress output
     pull['force'] = pull.load * 0.0098
     pull['stress'] = pull.force / (thickness * width * 0.001)
-    ## load output
-    # pull['stress'] = pull.load
-    # for data output as strain (0 as 5mm)
-    # pull['strain'] = (pull.position - ori_p) / (5000 + ori_p)
-    # for data output as strain (500 as 5mm)
     pull['strain'] = (pull.position - ori_p) / (5000 + ori_p)
-    # for data output as strain
-    # pull['strain'] = pull.position * 4500/5000
-
-    # pull['T_strain'] = np.log(1 + pull['strain'])
-    # pull['T_stress'] = pull.force/(thickness * width * (ori_p + 4500) / (pull.position + 4500) * 0.001)
-
 
 color = ['orange', 'red', 'purple']
 n = 1
